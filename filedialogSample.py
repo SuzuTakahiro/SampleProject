@@ -22,7 +22,7 @@ class FiledialogSampleApp(ttk.Frame):
 
     #ファイルダイアログを開いてfilenameEntryに反映させる
     def openFileDialog(self):
-        file  = filedialog.askopenfilename();
+        file  = filedialog.askopenfilename(filetypes=[("all files", "*"),("png","*.png"),("gif","*.gif"),("python","*.py")]);
         self.filename.set(file)
 
 
