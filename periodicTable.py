@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 
-Atoms ={
+# 原子の情報（原子名をキーに原子番号、原子名、質量を取得できる）
+ATOMS_INFO ={
 "H":(1,"水素",1.00794),"He":(2,"ヘリウム",4.002602),"Li":(3,"リチウム",6.941),"Be":(4,"ベリリウム",9.012182),"B":(5,"ホウ素",10.811)
 ,"C":(6,"炭素",12.0107),"N":(7,"窒素",14.00674),"O":(8,"酸素",15.9994),"F":(9,"フッ素",18.9984032),"Ne":(10,"ネオン",20.1797),"Na":(11,"ナトリウム",22.989770)
 ,"Mg":(12,"マグネシウム",24.3050),"Al":(13,"アルミニウム",26.981538),"Si":(14,"ケイ素",28.0855),"P":(15,"リン",30.973761),"S":(16,"硫黄",32.066)
@@ -27,11 +28,10 @@ Atoms ={
 "Cf":(98,"カリホルニウム",251),"Es":(99,"アインスタイニウム",252),"Fm":(100,"フェルミウム",257,),"Md":(101,"メンデレビウム",258)
 ,"No":(102,"ノーベリウム",259),"Lr":(103,"ローレンシウム",262),"Rf":(104,"ラザホージウム",261),"Db":(105,"ドブニウム",262),"Sg":(106,"シーボーギウム",266)
 ,"Bh":(107,"ボーリウム",264),"Hs":(108,"ハッシウム",269),"Mt":(109,"マイトネリウム",268),"Ds":(110,"ダームスタチウム",271),"Rg":(111,"レントゲニウム",272)
-# ,"Uub":(112,"ウンウンビウム",285),"Uut":(113,"ウンウントリウム",284),"Uuq":(114,"ウンウンアジウム",289),"Uup":(115,"ウンウンペチウム",288),"Uuh":(116,"ウンウンヘキシウム",292)
-,"Uus":(117,"ウンウンヘキシウム",)
 ,"Cn":(112,"コペルニシウム",285),"Nh":(113,"ニホニウム",286),"Fl":(114,"フレロビウム",289),"Mc":(115,"モスコビウム",290),"Lv":(116,"リバモリウム",293)
 ,"Ts":(117,"テネシン",294),"Og":(118,"オガネソン",294)}
-HorizontalDict=[
+
+PERIODIC_TABLE_LIST=[
 {1:"H",18:"He"},
 {1:"Li",2:"Be",13:"B",14:"C",15:"N",16:"O",17:"F",18:"Ne"},
 {1:"Na",2:"Mg",13:"Al",14:"Si",15:"P",16:"S",17:"Cl",18:"Ar"},
@@ -54,7 +54,7 @@ class PeriodicTable(ttk.Frame):
     def __init__(self,master,number,symbol,name,mass):
         super().__init__(master,borderwidth=5)
         # self.grid(column=0, row=1, sticky=(N, W, E, S))
-        self.pack(side="bottom")
+        self.pack()
         self.number =number
         self.symbol =symbol
         self.name  = name
@@ -64,7 +64,7 @@ class PeriodicTable(ttk.Frame):
     def create_widgets(self,name,number,mass):
         for vr in range(0,10):
             for hr in range(0,18):
-                name = HorizontalDict[vr].get(hr+1)
+                name = PERIODIC_TABLE_LIST[vr].get(hr+1)
                 if name is None:
                     label = ttk.Label(self)
                     label.grid(column=hr,row=vr,sticky=(N, W, E, S))
@@ -75,8 +75,8 @@ class PeriodicTable(ttk.Frame):
     def selectAtom(self,event):
         symname =event.widget["text"]
         print(symname)
-        print(Atoms.get(symname))
-        number,name,mass = Atoms.get(symname)
+        print(ATOMS_INFO.get(symname))
+        number,name,mass = ATOMS_INFO.get(symname)
         self.number.set(number)
         self.symbol.set(symname)
         self.name.set(name)
@@ -86,11 +86,11 @@ class PeriodicTable(ttk.Frame):
 class PeriodicTableApp(ttk.Frame):
 
     def __init__(self,master):
-        super().__init__(master,borderwidth=5)
+        super().__init__(master,borderwidth=30)
         self.pack()
-        self.variable()
+        self.init_variables()
         self.create_widgets()
-    def variable(self):
+    def init_variables(self):
         self.number = IntVar()
         self.symbol = StringVar()
         self.name = StringVar()
@@ -119,7 +119,7 @@ class PeriodicTableApp(ttk.Frame):
         voentry = ttk.Entry(atomview,textvariable=self.mass)
         voentry.pack(side="left")
 
-        PeriodicTable(self,self.number,self.symbol,self.name,self.mass,)
+        PeriodicTable(self,self.number,self.symbol,self.name,self.mass)
 
 
 
