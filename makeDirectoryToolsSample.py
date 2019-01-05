@@ -1,9 +1,9 @@
-import os
 from tkinter import *
 import tkinter.ttk as ttk
 import tkinter.filedialog as filedialog
 import os
 import tkinter.messagebox as messagebox
+
 
 # ディレクトリ構造をクラス化する
 class Directory():
@@ -42,7 +42,6 @@ class MakeDirectoryLogic():
     # ツリーの情報からDirectoryリストを作成する
     def createDirectoryList(self,rootiid,tree,dirList):
         dirname = tree.item(rootiid,"text")
-        print(dirname)
         children = tree.get_children(rootiid)
         childlist=[]
         dir = Directory(dirname,childlist)
@@ -58,24 +57,20 @@ class MakeDirectoryLogic():
     def makeDirectoryAction(self,tree,rootiid):
         dirList=[]
         self.createDirectoryList(rootiid,tree,dirList)
-        print(len(dirList[0].getSubDirs()))
         self.makeDirectory(self.rootPath,dirList)
 
-# アプリ
 class MakeDirectoryTools(ttk.Frame):
 
     def __init__(self,master):
         super().__init__(master)
-
         self.rootPath = StringVar()
-        self.addDir = StringVar()
         self.targetDir = StringVar()
+        self.addDir = StringVar()
         self.iid=""
         self.rootiid=""
         self.logic = MakeDirectoryLogic(self.rootPath.get())
         self.create_widgets()
 
-        #ツリーを左、入力パラメータを右に詰める
     def create_widgets(self):
         leftframe = self.createTreeView()
         leftframe.pack(side="left")
@@ -83,7 +78,6 @@ class MakeDirectoryTools(ttk.Frame):
         rightframe.pack(side="right")
         self.pack()
 
-        #ツリーのWidgetを作成
     def createTreeView(self):
         treeFrame = ttk.Frame(self)
         self.tree = ttk.Treeview(treeFrame)
@@ -97,11 +91,9 @@ class MakeDirectoryTools(ttk.Frame):
         self.iid = self.rootiid
         return treeFrame
 
-        #入力パラメータWidgetを作成
     def createInputPanel(self):
 
-        inputFrame = ttk.LabelFrame(self,text="InputParam",height=200)
-        inputFrame.propagate(False)
+        inputFrame = ttk.LabelFrame(self,text="InputParam")
         # 新しく作成するディレクトリのルート
         rootPathLabel = ttk.Label(inputFrame,text="RootPath")
         rootPathLabel.grid(column=0,row=0)
@@ -138,9 +130,14 @@ class MakeDirectoryTools(ttk.Frame):
         self.rootPath.set(folder)
         self.logic.setRootPath(folder)
 
+    # 指定されたディレクトリを反映
+    def targetDirectory(self,event):
+        self.iid = self.tree.focus()
+        if self.iid :
+            self.targetDir.set(self.tree.item(self.iid,"text"))
+
     #指定されたディレクトリに子階層を加える
     def insertDirectory(self):
-
         addDir = self.addDir.get()
         # ディレクトリ名がない場合は処理しない
         if addDir != "":
@@ -153,18 +150,12 @@ class MakeDirectoryTools(ttk.Frame):
                     messagebox.showerror("登録エラー","既に登録されています")
                     return
             self.tree.insert(self.iid,"end",text=self.addDir.get())
-
-    # 指定されたディレクトリを反映
-    def targetDirectory(self,event):
-        self.iid = self.tree.focus()
-        if self.iid :
-            self.targetDir.set(self.tree.item(self.iid,"text"))
-
     #ディレクトリを削除する
     def deleteDirectory(self):
         if self.iid == "" or self.iid == self.rootiid:
             messagebox.showerror("削除エラー","削除する階層を選択してください。\nmakedirectoryToolsディレクトリは削除できません。")
             return
+        self.tree.delete(self.iid)
 
     # ディレクトリを作成する
     def makeDirectory(self):
@@ -184,9 +175,10 @@ class MakeDirectoryTools(ttk.Frame):
         # ロジックのディレクトリ作成アクションを呼び出す
         self.logic.makeDirectoryAction(self.tree,self.rootiid)
 
+
+
 if __name__ == '__main__':
     master = Tk()
     master.title("MakeDirectory Tools")
-    dir = MakeDirectoryTools(master)
-
+    MakeDirectoryTools(master)
     master.mainloop()
