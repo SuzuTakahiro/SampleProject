@@ -220,10 +220,10 @@ class UIBuilderApp(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
         self.widgetsParts  = None
-        # TODO　canvsPartsから親を 取得したほうがいい
-        self.canvsFrame = None
         self.canvsParts = None
         self.optionParts = None
+        self.outputCommand = lambda : print("none")
+        self.setupMenu()
         self.createWidgets()
         self.pack()
 
@@ -232,10 +232,10 @@ class UIBuilderApp(ttk.Frame):
         widgetsFrame.propagate(False)
         widgetsFrame.pack(side = "left")
         self.widgetsParts = widgetparts = WidgetsParts(widgetsFrame)
-        self.canvsFrame  = ttk.Labelframe(self,text = "canvas",width="400",height="580")
-        self.canvsFrame.propagate(False)
-        self.canvsFrame.pack(side = "left")
-        self.canvsParts = CanvasParts(self.canvsFrame,width="400",height="580")
+        canvsFrame  = ttk.Labelframe(self,text = "canvas",width="400",height="580")
+        canvsFrame.propagate(False)
+        canvsFrame.pack(side = "left")
+        self.canvsParts = CanvasParts(canvsFrame,width="400",height="580")
         optionFrame  = ttk.Labelframe(self,text = "option",width="190",height="580")
         optionFrame.propagate(False)
         optionFrame.pack(side = "left")
@@ -256,9 +256,31 @@ class UIBuilderApp(ttk.Frame):
             height = self.widgetsParts.getHeightVar().get()
             self.canvsParts["width"]=width
             self.canvsParts["height"]=height
-            self.canvsFrame["width"]=width
-            self.canvsFrame["height"]=height
+            # 親のFrameもサイズを変更する
+            parent = self.canvsParts.master
+            parent["width"]=width
+            parent["height"]=height
         self.widgetsParts.setUpdateCommand(command)
+    def setupMenu(self):
+
+        menu = Menu(self.master)
+        createMenu = Menu(menu,tearoff = 0)
+        createMenu.add_command(label="output",command=lambda:self.outputCommand())
+        exitMenu = Menu(menu,tearoff = 0)
+        exitMenu.add_command(label="exit",command=lambda:self.master.destroy())
+        menu.add_cascade(label="作成",menu = createMenu)
+        menu.add_cascade(label="終了",menu = exitMenu)
+        self.master.config(menu=menu)
+    # Canvasパーツを取得する
+    def getCanvasParts(self):
+        return self.canvsParts
+    #ファイル出力コマンドの設定
+    def setOutputCommand(self,command):
+        print("set")
+        self.outputCommand = command
+        # self.outputCommand()
+
+
 
 
 if __name__ == '__main__':
