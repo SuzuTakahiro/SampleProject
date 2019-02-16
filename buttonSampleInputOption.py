@@ -86,9 +86,6 @@ class ButtonSampleInputOption(ttk.Frame):
 
 
 
-
-
-
 if __name__ == '__main__':
     master = Tk()
     master.title("ButtonSampleInputOption")
