@@ -44,9 +44,12 @@ class CSVControl:
         master.geometry("1000x400")
         self.view = CSVView(master)
         self.logic = CSVLogic()
+        self.view.setReadButtonCommand(self.readCsv)
         master.mainloop()
 
     def readCsv(self):
+        print("aaa")
+        print(self.view.getFilePath())
         ret = self.logic.readCsv(r"C:\Users\ponta\GitHub\SampleProject\CsvViewer\test.csv")
         if ret:
             messagebox.showinfo("readcsv","succeed")
@@ -54,4 +57,4 @@ class CSVControl:
 
 if __name__ == '__main__':
     control =  CSVControl()
-    control.readCsv()
+    # control.readCsv()

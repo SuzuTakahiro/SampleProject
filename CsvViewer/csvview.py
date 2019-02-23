@@ -4,22 +4,33 @@ import tkinter.filedialog as filedialog
 
 class FileOpenFrame(ttk.Frame):
 
-    def __init__(self, master):
+    def __init__(self, master,file_entry_width=100):
         super().__init__(master)
         self.filePath = StringVar()
-        self.createWidget()
+        self.createWidget(file_entry_width)
         self.pack()
 
-    def createWidget(self):
+    def createWidget(self,entry_width):
         filePathLabel = ttk.Label(self,text="FilePath")
         filePathLabel.grid(column=0,row=0)
-        filepathEntry = ttk.Entry(self,textvariable=self.filePath)
+        filepathEntry = ttk.Entry(self,textvariable=self.filePath,widt=entry_width)
         filepathEntry.grid(column=1,row=0)
         filepathButton = ttk.Button(self,text="open",command=self.openFileDialog)
         filepathButton.grid(column=2,row=0)
+        self.readButton = ttk.Button(self,text="read")
+        self.readButton.grid(column=3,row=0)
+
     def openFileDialog(self):
         file  = filedialog.askopenfilename(filetypes=[("csv", "*.csv")]);
         self.filePath.set(file)
+
+    def getFilePath(self):
+        return self.filePath.get()
+
+    def setReadButtonCommand(self,func):
+        print("add")
+        self.readButton["command"] = func
+
 
 class TreeView(ttk.Frame):
     def __init__(self,master):
@@ -186,20 +197,32 @@ class PropertyView(ttk.Frame):
 class CSVView(ttk.Frame):
     """docstring for ."""
     def __init__(self, master):
-        super().__init__(master)
+        super().__init__(master,borderwidth=10)
         self.tree = None
         self.createWidget()
         self.setAction()
         self.pack()
     def createWidget(self):
-        left_frame = ttk.LabelFrame(self,text="DB")
+        self.createUpperFrame()
+        self.createLowerFrame()
+
+    def createUpperFrame(self):
+        upper_frame = ttk.Frame(self)
+        upper_frame.pack()
+        self.file_path_frame = FileOpenFrame(upper_frame)
+
+    def createLowerFrame(self):
+        lower_frame = ttk.Frame(self)
+        lower_frame.pack()
+        left_frame = ttk.LabelFrame(lower_frame,text="DB")
         left_frame.pack(side="left")
         self.tree = TreeView(left_frame)
-        right_frame = ttk.LabelFrame(self,text="param")
+        right_frame = ttk.LabelFrame(lower_frame,text="param")
         right_frame.pack(side = "right")
-        # FileOpenFrame(right_frame)
+
         self.property  =PropertyView(right_frame)
         self.property.createWidget(self.tree.getColumn())
+
 
     def setAction(self):
         def _updateCommand():
@@ -219,7 +242,11 @@ class CSVView(ttk.Frame):
         self.tree.addSelectAction(_func)
 
 
-
+    def getFilePath(self):
+        return self.file_path_frame.getFilePath()
+    def setReadButtonCommand(self,_func):
+        func = _func
+        self.file_path_frame.setReadButtonCommand(func)
 
 
 
