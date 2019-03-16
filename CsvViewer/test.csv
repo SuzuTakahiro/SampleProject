@@ -1,3 +1,4 @@
-Name,Num,Value
-"orange",3,120
-"Apple",2,180
+index,Name,Num,Value
+1,"orange",3,120
+2,"Apple",2,180
+3,"banana",2,100
