@@ -68,7 +68,7 @@ class ComboboxFrame(ttk.Frame):
     def createWidget(self,entry_width):
         table_label = ttk.Label(self,text=TABLE_LIST_LABEL)
         table_label.grid(column=0,row=0)
-        self.combo= combo = ttk.Combobox(self,textvariable=self.table,width=entry_width)
+        self.combo= combo = ttk.Combobox(self,textvariable=self.table,width=entry_width,state="readonly")
         combo.grid(column=1,row=0)
         self.select_button = select_button = ttk.Button(self,text=TABLE_SELECT_BUTTON_LABEL)
         select_button.grid(column=2,row=0)
