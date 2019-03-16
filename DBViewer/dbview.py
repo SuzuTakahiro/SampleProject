@@ -2,6 +2,26 @@ from tkinter import *
 import tkinter.ttk as ttk
 import tkinter.filedialog as filedialog
 
+TITLE_NAME_LABEL="SQLiteViewer"
+FILE_PATH_LABEL="FilePath"
+FILE_OPEN_BUTTON_LABEL="open"
+FILE_READ_BUTTON_LABEL="read"
+TABLE_LIST_LABEL="TableList"
+TABLE_SELECT_BUTTON_LABEL="select"
+TREE_TITLE_LABEL="DBData"
+ROW_DATA_TITLE_LABEL="RawData"
+ROW_DATA_UPDATE_BUTTON_LABEL="update"
+ROW_DATA_INSERT_BUTTON_LABEL="insert"
+ROW_DATA_SAVE_BUTTON_LABEL="save"
+INSERT_MESSAGE_DIALOG_TITLE="insert"
+INSERT_MESSAGE_SUCCEED="insert succeed"
+INSERT_MESSAGE_FAILED="insert failed"
+UPDATE_MESSAGE_DIALOG_TITLE="update"
+UPDATE_MESSAGE_SUCCEED="update succeed"
+SAVE_MESSAGE_DIALOG_TITLE="save"
+SAVE_MESSAGE_SUCCEED="save succeed"
+SAVE_MESSAGE_FAILED="save failed"
+
 class FileOpenFrame(ttk.Frame):
     """
     ファイルの読み込み用フレーム
@@ -13,13 +33,13 @@ class FileOpenFrame(ttk.Frame):
         self.pack()
 
     def createWidget(self,entry_width):
-        filePathLabel = ttk.Label(self,text="FilePath")
+        filePathLabel = ttk.Label(self,text=FILE_PATH_LABEL)
         filePathLabel.grid(column=0,row=0)
         filepathEntry = ttk.Entry(self,textvariable=self.filePath,widt=entry_width)
         filepathEntry.grid(column=1,row=0)
-        filepathButton = ttk.Button(self,text="open",command=self.openFileDialog)
+        filepathButton = ttk.Button(self,text=FILE_OPEN_BUTTON_LABEL,command=self.openFileDialog)
         filepathButton.grid(column=2,row=0)
-        self.readButton = ttk.Button(self,text="read")
+        self.readButton = ttk.Button(self,text=FILE_READ_BUTTON_LABEL)
         self.readButton.grid(column=3,row=0)
 
     def openFileDialog(self):
@@ -46,14 +66,16 @@ class ComboboxFrame(ttk.Frame):
         self.pack()
 
     def createWidget(self,entry_width):
-        table_label = ttk.Label(self,text="SelectTable")
+        table_label = ttk.Label(self,text=TABLE_LIST_LABEL)
         table_label.grid(column=0,row=0)
         self.combo= combo = ttk.Combobox(self,textvariable=self.table,width=entry_width)
         combo.grid(column=1,row=0)
-        self.select_button = select_button = ttk.Button(self,text="select")
+        self.select_button = select_button = ttk.Button(self,text=TABLE_SELECT_BUTTON_LABEL)
         select_button.grid(column=2,row=0)
 
     def setComboValues(self,values):
+        self.table.set(values[0])
+        print(self.table.get())
         self.combo['values'] = values
 
     def getTableName(self):
@@ -64,7 +86,7 @@ class ComboboxFrame(ttk.Frame):
 
 class TreeView(ttk.Frame):
     """
-    csvのデータを実際に表示するTreeview
+    DBのデータを実際に表示するTreeview
     """
     def __init__(self,master):
         super().__init__(master)
@@ -127,6 +149,7 @@ class TreeView(ttk.Frame):
         レコードが選択されたときに呼ばれるイベントを登録
         """
         self.tree.bind("<<TreeviewSelect>>",func)
+
     def getItem(self):
         """
         現在選択状態のレコードの取得
@@ -169,11 +192,13 @@ class TreeView(ttk.Frame):
         値の更新
         """
         self.tree.item(self.iid,values=new_values)
+
     def updateValue(self,new_values):
         """
         現在選択されているレコードの値の更新
         """
         self.tree.item(self.selcted_iid,values=new_values)
+
     def update(self,value_dict):
         """
         マップからリストに変更後
@@ -244,6 +269,7 @@ class PropertyView(ttk.Frame):
         self.pack()
         self.param_dict={}
         self.save_func = None
+
     def createWidget(self,columns):
         """
         列の要素数分入力ボックスの作成
@@ -265,8 +291,8 @@ class PropertyView(ttk.Frame):
         """
         button_frame = ttk.Frame(self)
         button_frame.pack(anchor="e")
-        self.update_button = update = ttk.Button(button_frame,text = "commit")
-        self.insert_button = insert = ttk.Button(button_frame,text = "insert")
+        self.update_button = update = ttk.Button(button_frame,text = ROW_DATA_UPDATE_BUTTON_LABEL)
+        self.insert_button = insert = ttk.Button(button_frame,text = ROW_DATA_INSERT_BUTTON_LABEL)
         update.pack(side="left")
         insert.pack(side="left")
 
@@ -277,7 +303,7 @@ class PropertyView(ttk.Frame):
         save_frame = ttk.Frame(self)
         save_frame.pack(anchor="e")
 
-        self.save_button = save = ttk.Button(save_frame,text = "Save")
+        self.save_button = save = ttk.Button(save_frame,text = ROW_DATA_SAVE_BUTTON_LABEL)
         if self.save_func:
             self.save_button["command"] = self.save_func
         save.pack(side="left")
@@ -292,12 +318,22 @@ class PropertyView(ttk.Frame):
             child.destroy()
 
     def setUpdateButtonCommand(self,command):
+        """
+        updateボタンにコマンドを登録する
+        """
         self.update_button["command"] = command
 
     def setInsertButtonCommand(self,command):
+        """
+        insertボタンにコマンドを登録する
+        """
         self.insert_button["command"] = command
 
     def setSaveButtonCommand(self,command):
+        """
+        saveボタンに保存コマンドを登録する
+        データが登録されるごとに登録しなおす必要があるので関数も別途保持する
+        """
         self.save_button["command"] =self.save_func = command
 
     def setParameter(self,param):
@@ -319,12 +355,13 @@ class PropertyView(ttk.Frame):
 
 class DBView(ttk.Frame):
     """
-    CsvViewerのメインView
+    DBViewerのメインView
 
     """
     def __init__(self, master):
         super().__init__(master,borderwidth=10)
         self.tree = None
+        self.p_key_id =-1
         self.createWidget()
         self.setAction()
         self.pack()
@@ -338,7 +375,7 @@ class DBView(ttk.Frame):
 
     def createUpperFrame(self):
         """
-        Csv読み込み用フレーム
+        DB読み込み用フレーム
         """
         upper_frame = ttk.Frame(self)
         upper_frame.pack()
@@ -352,10 +389,10 @@ class DBView(ttk.Frame):
         """
         lower_frame = ttk.Frame(self)
         lower_frame.pack()
-        left_frame = ttk.LabelFrame(lower_frame,text="DBData")
+        left_frame = ttk.LabelFrame(lower_frame,text=TREE_TITLE_LABEL)
         left_frame.pack(side="left")
         self.tree = TreeView(left_frame)
-        right_frame = ttk.LabelFrame(lower_frame,text="RowData")
+        right_frame = ttk.LabelFrame(lower_frame,text=ROW_DATA_TITLE_LABEL)
         right_frame.pack(side = "right",anchor="n")
 
         self.property = PropertyView(right_frame)
@@ -371,14 +408,25 @@ class DBView(ttk.Frame):
             更新アクション
             """
             param = self.property.getParameter()
-            print(param)
+            item = self.tree.getDataMap()
+            if self.p_key != "":
+                if param[self.p_key] != item[self.p_key]:
+                    _insertCommand()
+                    return
             self.tree.update(param)
+            messagebox.showinfo(UPDATE_MESSAGE_DIALOG_TITLE,UPDATE_MESSAGE_SUCCEED)
+
         def _insertCommand():
             """
             挿入アクション
             """
             param = self.property.getParameter()
-            self.tree.insert(param)
+            # 重複チェックを行う
+            if self.checkPrimaryKey(param):
+                self.tree.insert(param)
+                messagebox.showinfo(INSERT_MESSAGE_DIALOG_TITLE,INSERT_MESSAGE_SUCCEED)
+            else:
+                messagebox.showerror(INSERT_MESSAGE_DIALOG_TITLE,INSERT_MESSAGE_FAILED)
 
         def _func(event):
             """
@@ -396,11 +444,13 @@ class DBView(ttk.Frame):
         ファイルパスの取得
         """
         return self.file_path_frame.getFilePath()
+
     def setReadButtonCommand(self,func):
         """
         読み込みボタンコマンド登録
         """
         self.file_path_frame.setReadButtonCommand(func)
+
     def setNewColumnAndData(self,columns,rows):
         """
         新しい列名とレコードを設定する。
@@ -415,7 +465,6 @@ class DBView(ttk.Frame):
         """
         保存ボタンコマンド登録
         """
-        print("sss")
         self.property.setSaveButtonCommand(func)
     def getColumns(self):
         """
@@ -427,19 +476,58 @@ class DBView(ttk.Frame):
         レコードリスト取得
         """
         return self.tree.getRows()
-    def setTableInfo(self,values):
+
+    def setTableNameList(self,values):
+        """
+        DBに入っているテーブルのリストを設定する
+        """
         self.combo_box_frame.setComboValues(values)
 
     def getSelectTable(self):
+        """
+        選択されているテーブル名を取得する
+        """
         return self.combo_box_frame.getTableName()
 
     def setTableCommand(self,func):
+        """
+        テーブル名を決定したときのコマンドを登録する
+        """
+
         self.combo_box_frame.setTableCommand(func)
+
+    def setPrimaryKey(self,p_key):
+        """
+        主キーを登録する
+        主キーと列名から対応する列番号も保持しておく
+        """
+        self.p_key = ""
+        self.p_key_id= -1
+        for id,column in enumerate(self.getColumns()):
+            if column == p_key:
+                self.p_key = p_key
+                self.p_key_id= id
+
+    def checkPrimaryKey(self,new_data):
+        """
+        主キーが登録済みでない(登録可能)か調べる
+        主キーが設定されていなければ常に登録可能
+        """
+        if self.p_key == "" or self.p_key_id == -1:
+            return True
+        print(self.p_key,new_data)
+        check_data = new_data[self.p_key]
+        print(check_data)
+        for row in self.getRows():
+            if check_data == row[self.p_key_id]:
+                return False
+        return True
+
 
 
 if __name__ == '__main__':
     master = Tk()
-    master.title("csvview")
+    master.title("DBview")
     DBView(master)
     master.geometry("800x400")
     master.mainloop()
