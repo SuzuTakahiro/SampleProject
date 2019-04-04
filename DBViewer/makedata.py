@@ -26,8 +26,8 @@ def readTableNames(cursor):
         print(data)
 
 def readTableInfo(cursor,table = "FRUIT"):
-    cursor.execute("PRAGMA TABLE_INFO(FRUIT)")  ### テーブルmpos_Sのカラム情報を取得
-    cols = cursor.fetchall()  ### 1つのカラム情報は6要素を含むタプルで，複数のカラム情報のリストが得られる
+    cursor.execute("PRAGMA TABLE_INFO(FRUIT)")
+    cols = cursor.fetchall()
     print([item[1] for item in cols])
 
 if __name__ == '__main__':
@@ -42,8 +42,8 @@ if __name__ == '__main__':
         makeTable(cursor)
         insertData(cursor)
         # readData(cursor)
-        readTableNames(cursor)
-        readTableInfo(cursor)
+        # readTableNames(cursor)
+        # readTableInfo(cursor)
     except sqlite3.Error as e:
         print('sqlite3 Error occurred:', e.args[0])
     connection.commit()
