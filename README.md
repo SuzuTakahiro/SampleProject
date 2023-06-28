@@ -1,2 +1,2 @@
 # SampleProject
-Sample progaram using Tk
+Sample program using Tk
